@@ -32,3 +32,13 @@ The `useradd` command creates a user account. The `-s` option specifies the logi
 
 ## Status
 Completed
+
+## Screenshot Evidence
+
+### Linux User Creation
+
+The following screenshot verifies that user `jim` has a non-interactive shell on App Server 3.
+
+![Linux user jim with non-interactive shell](screenshots/user-verification.png)
+
+
