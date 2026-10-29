@@ -31,13 +31,15 @@ sudo chage -l ammar
 - `getent passwd`: Retrieves user account information.
 - `chage -l`: Displays account expiry and password aging information.
 
+
 ## Screenshot Evidence
 
 ### Task Question
-![Day 02 task question](screenshots/task-question.png)
+![Day 02 task question](screenshots/day-02-task-question.png)
 
 ### Task Solution
-![Day 02 task solution](screenshots/task-solution.png)
+![Day 02 task solution](screenshots/day-02-task-solution.png)
 
 ## Status
 Completed the Linux user creation task and configured the account expiry date.
+
