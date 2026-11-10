@@ -4,11 +4,15 @@
 
 ### Task: Fix Apache Service Connectivity on Port 6300
 
-## Objective
+## Task Description
 
 The Apache service on App Server 1 (`stapp01`) was not reachable from the Jump Host on port `6300`.
 
-The goal was to troubleshoot the issue, restore Apache connectivity, and ensure secure access without modifying the existing `index.html` file.
+The objective was to troubleshoot the issue, restore Apache connectivity, and ensure secure access without compromising server security or modifying the existing `index.html` file.
+
+## Task Screenshot
+
+![Day 12 Task Question](screenshots/task-question.png)
 
 ## Troubleshooting and Implementation
 
@@ -19,7 +23,7 @@ The goal was to troubleshoot the issue, restore Apache connectivity, and ensure 
 5. Found Sendmail listening on `127.0.0.1:6300`.
 6. Backed up the Apache configuration file.
 7. Updated Apache's Listen directive to bind to the application server IP address on port `6300`.
-8. Validated Apache configuration.
+8. Validated Apache configuration using `httpd -t`.
 9. Started Apache successfully.
 10. Inspected firewall rules using `iptables`.
 11. Configured firewall access for the Jump Host.
@@ -76,13 +80,13 @@ sudo systemctl start httpd
 sudo systemctl status httpd
 ```
 
-### 7. Check Firewall Rules
+### 7. Configure and Verify Firewall
 
 ```bash
 sudo iptables -L INPUT -n -v --line-numbers
 ```
 
-The firewall rule should allow new TCP connections to port `6300` only from the Jump Host IP address (`10.244.244.155`).
+The inbound firewall rule should allow new TCP connections to port `6300` only from the Jump Host IP address (`10.244.244.155`).
 
 ### 8. Test Connectivity from Jump Host
 
@@ -90,24 +94,23 @@ The firewall rule should allow new TCP connections to port `6300` only from the 
 curl http://stapp01:6300
 ```
 
+## Solution Screenshots
+
+### Screenshot 1 – Apache Configuration, Service Status and Firewall
+
+![Apache Configuration and Firewall](screenshots/01-apache-configuration-service-firewall.png)
+
+### Screenshot 2 – Successful Curl Connectivity Test
+
+![Curl Connectivity Test](screenshots/02-curl-connectivity-test.png)
+
 ## Final Verification
 
 - Apache service started successfully.
 - Apache listens on port `6300`.
 - Firewall access was configured for the Jump Host.
-- HTTP response was received successfully from the Jump Host.
+- HTTP response was successfully received from the Jump Host.
 - Existing `index.html` was not modified.
-
-## Screenshots
-
-### Task Description
-![Task Question](screenshots/task-question.png)
-
-### Apache Configuration, Service Status and Firewall
-![Apache Configuration and Firewall](screenshots/01-apache-configuration-service-firewall.png)
-
-### Successful Connectivity Test
-![Curl Connectivity Test](screenshots/02-curl-connectivity-test.png)
 
 ## Key Learnings
 
@@ -117,11 +120,12 @@ curl http://stapp01:6300
 - Understanding the Apache Listen directive.
 - Firewall management using `iptables`.
 - Testing HTTP connectivity using `curl`.
-- Applying network security by restricting inbound access.
+- Restricting inbound network access for better security.
 
 ---
 
-**Challenge:** KodeKloud Engineer – 100 Days of DevOps  
+**Platform:** KodeKloud Engineer  
+**Challenge:** 100 Days of DevOps  
 **Day:** 12  
 **Topic:** Linux Network Services  
 **Status:** Completed
