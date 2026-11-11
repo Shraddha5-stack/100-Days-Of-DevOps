@@ -1,0 +1,140 @@
+# Day 13 – Install and Configure iptables Firewall
+
+## 📌 Task Overview
+
+The Nautilus infrastructure security team required Apache traffic on port `5004` to be restricted. The port must be accessible only from the Load Balancer (LBR) host. All other incoming sources must be blocked.
+
+## 🎯 Objectives
+
+1. Install iptables and its dependencies on all three application servers.
+2. Allow incoming TCP traffic on port `5004` only from the Load Balancer.
+3. Block incoming TCP traffic on port `5004` from all other sources.
+4. Make firewall rules persistent across reboots.
+
+## 🖥️ Infrastructure Details
+
+| Server | Hostname | IP Address |
+|---|---|---|
+| App Server 1 | stapp01 | 10.244.248.17 |
+| App Server 2 | stapp02 | 10.244.13.59 |
+| App Server 3 | stapp03 | 10.244.244.186 |
+| Load Balancer | stlb01 | 10.244.81.49 |
+
+- **Operating System:** CentOS Stream 9
+- **Firewall:** iptables (legacy)
+- **Protected Port:** TCP 5004
+
+## ⚙️ Implementation
+
+### 1. Install iptables
+
+Executed on all three application servers:
+
+```bash
+sudo dnf install -y iptables iptables-services
+```
+
+Verify installation:
+
+```bash
+sudo iptables --version
+rpm -qa | grep iptables
+```
+
+### 2. Configure Firewall Rules
+
+Allow traffic from the Load Balancer:
+
+```bash
+sudo iptables -I INPUT 1 -p tcp -s 10.244.81.49 --dport 5004 -j ACCEPT
+```
+
+Block traffic from all other sources:
+
+```bash
+sudo iptables -I INPUT 2 -p tcp --dport 5004 -j DROP
+```
+
+The ACCEPT rule must appear before the DROP rule.
+
+### 3. Verify Firewall Rules
+
+```bash
+sudo iptables -L INPUT -n -v --line-numbers
+```
+
+Expected rules:
+
+```text
+1 ACCEPT tcp -- * * 10.244.81.49 0.0.0.0/0 tcp dpt:5004
+2 DROP   tcp -- * * 0.0.0.0/0    0.0.0.0/0 tcp dpt:5004
+```
+
+### 4. Make Firewall Rules Persistent
+
+Save the firewall rules:
+
+```bash
+sudo iptables-save | sudo tee /etc/sysconfig/iptables
+```
+
+Enable the iptables service:
+
+```bash
+sudo systemctl enable iptables
+```
+
+Restart the service:
+
+```bash
+sudo systemctl restart iptables
+```
+
+Verify service status:
+
+```bash
+sudo systemctl status iptables
+```
+
+## ✅ Verification Results
+
+Configuration was applied on all three application servers.
+
+- iptables packages installed successfully.
+- Load Balancer IP `10.244.81.49` allowed on TCP port `5004`.
+- All other sources blocked on TCP port `5004`.
+- Firewall rules saved in `/etc/sysconfig/iptables`.
+- iptables service enabled and restarted.
+- Service reported `active (exited)` with successful firewall rule application.
+
+**Note:** End-to-end connectivity testing through the Load Balancer was not separately performed.
+
+## 📸 Screenshots
+
+### Evidence 1
+
+![iptables Configuration Evidence 1](screenshots/evidence-01.png)
+
+### Evidence 2
+
+![iptables Configuration Evidence 2](screenshots/evidence-02.png)
+
+## 📚 Key Learnings
+
+- Installing and managing iptables on CentOS Stream 9.
+- Configuring ACCEPT and DROP firewall rules.
+- Understanding firewall rule order.
+- Restricting application access using source IP addresses.
+- Saving firewall rules for persistence across reboots.
+- Managing the iptables systemd service.
+
+## 🏁 Outcome
+
+Successfully configured iptables on all three application servers to allow TCP port `5004` only from the trusted Load Balancer IP and drop traffic from all other sources. Firewall rules were saved and the iptables service was enabled.
+
+---
+
+**Repository:** [100 Days of DevOps](https://github.com/Shraddha5-stack/100-Days-Of-DevOps)
+
+**Day 13:** Install iptables and restrict Apache port 5004 to Load Balancer.
+
