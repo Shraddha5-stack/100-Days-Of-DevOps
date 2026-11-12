@@ -1,0 +1,162 @@
+# Day 14 – Fix Apache Service on All App Servers
+
+## 📌 Task Overview
+
+The production support team at xFusionCorp Industries received a monitoring alert indicating that the Apache service was unavailable on one of the application servers in Stratos DC.
+
+The objective was to identify the faulty server, troubleshoot the issue, and ensure Apache was running on all three application servers using port `8088`.
+
+## 🎯 Objectives
+
+- Identify the application server where Apache was failing.
+- Troubleshoot and resolve the Apache service issue.
+- Ensure Apache is running on all three application servers.
+- Verify Apache is listening on port `8088`.
+
+## 🖥️ Infrastructure Details
+
+| Server | Hostname | Username |
+|---|---|---|
+| App Server 1 | stapp01 | tony |
+| App Server 2 | stapp02 | steve |
+| App Server 3 | stapp03 | banner |
+
+**Operating System:** CentOS Stream 9  
+**Web Server:** Apache HTTP Server (httpd)  
+**Required Port:** 8088
+
+## 🔍 Troubleshooting and Root Cause
+
+During investigation on App Server 1 (`stapp01`), Apache failed to start.
+
+The error message was:
+
+```text
+(98) Address already in use
+no listening sockets available
+```
+
+Further investigation revealed that the Sendmail service was occupying port `8088` on `127.0.0.1`.
+
+Apache was also configured to listen on port `8088`, resulting in a port conflict.
+
+## 🛠️ Solution
+
+### 1. Identify the Port Conflict
+
+```bash
+sudo ss -tulnp
+```
+
+Check Apache listening configuration:
+
+```bash
+sudo grep -Rni '^[[:space:]]*Listen' /etc/httpd/conf /etc/httpd/conf.d/
+```
+
+### 2. Back Up Sendmail Configuration
+
+```bash
+sudo cp -a /etc/mail/sendmail.mc /etc/mail/sendmail.mc.bak
+```
+
+### 3. Correct Sendmail Port
+
+Changed Sendmail from port `8088` to its standard SMTP port.
+
+```bash
+sudo sed -i 's/Port=8088/Port=smtp/' /etc/mail/sendmail.mc
+```
+
+Verify:
+
+```bash
+sudo grep -n 'DAEMON_OPTIONS' /etc/mail/sendmail.mc
+```
+
+### 4. Regenerate Configuration and Restart Sendmail
+
+```bash
+sudo make -C /etc/mail
+sudo systemctl restart sendmail
+sudo systemctl status sendmail
+```
+
+### 5. Start Apache
+
+```bash
+sudo systemctl start httpd
+```
+
+Enable Apache at boot:
+
+```bash
+sudo systemctl enable httpd
+```
+
+Check service status:
+
+```bash
+sudo systemctl status httpd
+```
+
+### 6. Verify Apache Port
+
+```bash
+sudo ss -tulnp | grep 8088
+```
+
+Expected listening port:
+
+```text
+*:8088
+```
+
+## ✅ Verification
+
+The task requires Apache to be running on all three application servers.
+
+| Server | Apache Service | Required Port |
+|---|---|---|
+| stapp01 | Active (running) | 8088 |
+| stapp02 | Active (running) | 8088 |
+| stapp03 | Verify using terminal evidence | 8088 |
+
+## 📸 Screenshots
+
+### Task Description
+
+![Task Question](screenshots/task-question.png)
+
+### App Server 1 – stapp01
+
+![App Server 1 Solution](screenshots/appserver1.png)
+
+### App Server 2 – stapp02
+
+![App Server 2 Solution](screenshots/appserver2.png)
+
+### App Server 3 – stapp03
+
+![App Server 3 Solution](screenshots/appserver3.png)
+
+## 📚 Key Learnings
+
+- Troubleshooting Apache service failures.
+- Identifying port conflicts using `ss`.
+- Understanding Apache listening configuration.
+- Managing Sendmail configuration.
+- Using systemctl to manage Linux services.
+- Verifying network ports and listening processes.
+- Enabling services at system startup.
+
+## 🏁 Conclusion
+
+Identified a port conflict between Apache and Sendmail on App Server 1. Corrected the Sendmail configuration, restarted the service, and successfully started Apache on port `8088`.
+
+The objective is to maintain Apache availability across all three application servers.
+
+---
+
+**Repository:** [100 Days of DevOps](https://github.com/Shraddha5-stack/100-Days-Of-DevOps)
+
