@@ -126,17 +126,27 @@ The task requires Apache to be running on all three application servers.
 
 ### Task Description
 
-![Task Question](screenshots/task-question.png)
+## 📸 Practical Implementation Screenshots
 
-### App Server 1 – stapp01
+### 1. KodeKloud Task
+
+![Day 14 Task Question](screenshots/task-question.png)
+
+### 2. App Server 1 – stapp01
+
+Apache port conflict troubleshooting, Sendmail configuration correction, and Apache service verification.
 
 ![App Server 1 Solution](screenshots/appserver1.png)
 
-### App Server 2 – stapp02
+### 3. App Server 2 – stapp02
+
+Apache service status and port 8088 verification.
 
 ![App Server 2 Solution](screenshots/appserver2.png)
 
-### App Server 3 – stapp03
+### 4. App Server 3 – stapp03
+
+Apache service status and port 8088 verification.
 
 ![App Server 3 Solution](screenshots/appserver3.png)
 
